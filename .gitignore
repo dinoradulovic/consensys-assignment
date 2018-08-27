@@ -1,0 +1,11 @@
+# Dependency directory
+node_modules
+
+# Webstorm
+.idea
+
+# local env variables
+.env
+
+# truffle build directory
+build/
