@@ -1,0 +1,21 @@
+.store-owner-dashboard .stores-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.store-owner-dashboard .stores-list .store {
+    height: 200px;
+    width: 200px;
+    background: #0c1a2b;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 20%;
+    margin: 2%;
+}
+.store-owner-dashboard .stores-list a {
+    text-decoration: none;
+}

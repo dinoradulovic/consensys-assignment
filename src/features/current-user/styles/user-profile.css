@@ -1,0 +1,27 @@
+.user-profile {
+    background: #2f435a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: .5em;
+}
+
+.user-profile  p {
+    font-weight: bold;
+    margin: 0 10px 0 0;
+    color: darkgrey;
+}
+
+.user-profile span {
+    color: white;
+}
+
+.user-profile .address-container {
+    display: flex;
+    align-items: center;
+}
+
+.user-profile .account-type-container {
+    display: flex;
+    align-items: center;
+}
