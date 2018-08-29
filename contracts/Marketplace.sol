@@ -84,6 +84,21 @@ contract Marketplace {
         return ids;
     }
 
+    function getOwnerFromStore(uint _storeId)
+    public view
+    returns(address) {
+        Store storage store = storeById[_storeId];
+        return store.owner;
+    }
+
+    function getStoreBalance(uint _storeId)
+    public view
+    returns(uint) {
+        Store storage store = storeById[_storeId];
+        return store.balance;
+    }
+
+
     /// @notice adds product to store
     function addProductToStore(uint _storeId, bytes32 _name, uint _price) public {
         productsCount[_storeId]++;
@@ -154,4 +169,13 @@ contract Marketplace {
         storeById[_storeId].balance += productById[_productId].price;
     }
 
+    /// @notice withdraw from store
+    /// @dev transfers balance to store owner
+    function withdrawFromStore(uint _storeId, uint _amount) public {
+        Store storage store = storeById[_storeId];
+        store.balance -= _amount;
+
+        address storeOwner = msg.sender;
+        storeOwner.transfer(_amount);
+    }
 }

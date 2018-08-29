@@ -1,8 +1,10 @@
 pragma solidity ^0.4.24;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 /// @title Auth - manages users
 /// @author Dino Radulovic
-contract Auth {
+contract Auth is Ownable {
     address public owner;
 
     /// @notice admins
@@ -26,6 +28,7 @@ contract Auth {
 
     /// @notice adds an admin
     function addAdmin(address _address)
+        onlyOwner
         public
     {
         require(admins[_address] != true);
@@ -35,6 +38,7 @@ contract Auth {
 
     /// @notice removes the admin
     function removeAdmin(address _address)
+        onlyOwner
         public
     {
         delete admins[_address];
