@@ -107,13 +107,13 @@ export default class Store extends Component {
   }
 
   async updateProductPrice(productId) {
-    const { marketplaceContract, account } = this.props;
+    const { marketplaceContract, account, web3 } = this.props;
     const storeId = this.props.match.params.id;
 
     const transaction = await marketplaceContract.updateProductPrice(
       storeId,
       productId,
-      parseFloat(this.refs["new-price"].value),
+      web3.toWei(this.refs["new-price"].value, "ether"),
       {
         from: account,
         gas: 4600000
@@ -134,7 +134,7 @@ export default class Store extends Component {
   }
 
   async buyProduct(productId, productPrice, productName) {
-    const { marketplaceContract, account, web3 } = this.props;
+    const { marketplaceContract, account } = this.props;
     const storeId = this.props.match.params.id;
 
     try {

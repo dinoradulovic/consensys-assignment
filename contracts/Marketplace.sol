@@ -1,8 +1,11 @@
 pragma solidity ^0.4.24;
 
+import './Auth.sol';
+
 /// @title Marketplace - manages stores and products
 /// @author Dino Radulovic
 contract Marketplace {
+    address authContractAddress;
     uint public storeIdGenerator;
 
     struct Store {
@@ -28,17 +31,32 @@ contract Marketplace {
     mapping (uint => Product[]) public products;
     mapping (uint => uint) public productsCount;
 
+    /// @notice checks if store owner is making a call
+    modifier isStoreOwner() {
+        Auth auth = Auth(authContractAddress);
+        require(auth.storeOwners(msg.sender));
+        _;
+    }
+
     /// @notice events
     event StoreAdded(address indexed addr, uint id);
     event ProductAdded(uint indexed storeId, uint id, bytes32 name, uint price);
     event ProductRemoved(uint indexed storeId, uint id, bytes32 name, uint price);
     event ProductPriceUpdated(uint productId, uint price);
 
-    /// @notice saves the store
+    constructor(address _authContractAddress)
+    public
+    {
+        authContractAddress = _authContractAddress;
+    }
+
+    /// @notice adds the store
     /// @dev increments track of stores count - tracked by senders account
     /// @dev store IDs are saved in the array
     /// @dev store IDs are used later to get the store
-    function addStore() public {
+    function addStore()
+    isStoreOwner()
+    public {
         storeIdGenerator++;
         storesCountByAccount[msg.sender]++;
 
@@ -84,13 +102,7 @@ contract Marketplace {
         return ids;
     }
 
-    function getOwnerFromStore(uint _storeId)
-    public view
-    returns(address) {
-        Store storage store = storeById[_storeId];
-        return store.owner;
-    }
-
+    /// @notice gets balance for particular store
     function getStoreBalance(uint _storeId)
     public view
     returns(uint) {
@@ -99,8 +111,10 @@ contract Marketplace {
     }
 
 
-    /// @notice adds product to store
-    function addProductToStore(uint _storeId, bytes32 _name, uint _price) public {
+    /// @notice adds product to the store
+    function addProductToStore(uint _storeId, bytes32 _name, uint _price)
+    isStoreOwner()
+    public {
         productsCount[_storeId]++;
         Product memory product = Product(productsCount[_storeId], _storeId, _name, _price);
         products[_storeId].push(product);
@@ -111,7 +125,9 @@ contract Marketplace {
 
     /// @notice removes product from the store
     /// @dev some things are weird here, I definitely underestimated it
-    function removeProductFromStore(uint _storeId, uint _index) public {
+    function removeProductFromStore(uint _storeId, uint _index)
+    isStoreOwner()
+    public {
         uint productId = products[_storeId][_index].id;
         bytes32 productName = products[_storeId][_index].name;
         uint productPrice = products[_storeId][_index].price;
@@ -133,7 +149,6 @@ contract Marketplace {
     function getProducts(uint _storeId)
     public view
     returns (uint[], bytes32[], uint[]) {
-
         uint[] memory productIds = new uint[](productsCount[_storeId]);
         bytes32[] memory productNames = new bytes32[](productsCount[_storeId]);
         uint[] memory productPrices = new uint[](productsCount[_storeId]);
@@ -148,8 +163,10 @@ contract Marketplace {
         return (productIds, productNames, productPrices);
     }
 
-    /// @notice updates product price
-    function updateProductPrice(uint _storeId, uint _productId, uint _newPrice)
+    /// @notice updates the product price
+    function updateProductPrice
+    (uint _storeId, uint _productId, uint _newPrice)
+    isStoreOwner()
     public {
         for (uint i = 0; i < productsCount[_storeId]; i++) {
             if (_productId == products[_storeId][i].id) {
@@ -169,13 +186,18 @@ contract Marketplace {
         storeById[_storeId].balance += productById[_productId].price;
     }
 
-    /// @notice withdraw from store
-    /// @dev transfers balance to store owner
-    function withdrawFromStore(uint _storeId, uint _amount) public {
+    /// @notice withdraw from the store
+    /// @dev transfers balance to the store owner
+    function withdrawFromStore(uint _storeId, uint _amount)
+    isStoreOwner()
+    public {
         Store storage store = storeById[_storeId];
+
+        require(msg.sender == store.owner);
+
         store.balance -= _amount;
 
-        address storeOwner = msg.sender;
+        address storeOwner = store.owner;
         storeOwner.transfer(_amount);
     }
 }
