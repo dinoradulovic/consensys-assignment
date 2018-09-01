@@ -120,7 +120,7 @@ contract('Marketplace', (accounts) => {
       const storeId = storeIdGenerator.toNumber();
 
       await MarketplaceContractInstance.addStore({from: storeOwner});
-      const secondStoreIdGen = await MarketplaceContractInstance.storeIdGenerator()
+      const secondStoreIdGen = await MarketplaceContractInstance.storeIdGenerator();
       const secondStoreId = secondStoreIdGen.toNumber();
 
       const productName = "Some Product Name";
@@ -139,7 +139,7 @@ contract('Marketplace', (accounts) => {
 
       await MarketplaceContractInstance.addProductToStore(
         storeId, productName, productPrice,
-        { from: storeOwnerTwo });
+        { from: storeOwner });
 
       const secondProductId = await MarketplaceContractInstance.productsCount(secondStoreId);
       const secondProduct = await MarketplaceContractInstance.productById(secondProductId);

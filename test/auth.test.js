@@ -17,7 +17,6 @@ contract('Auth', (accounts) => {
     });
 
     it('should add admin successfully', async () => {
-
       const firstAdminCandidate = accounts[1];
 
       const AuthContractInstance = await Auth.deployed();
@@ -26,6 +25,7 @@ contract('Auth', (accounts) => {
 
       assert.isTrue(isAdmin);
     });
+
 
     it('should throw an error when adding admin more than once', async () => {
       const alreadyAddedAdminAddress = accounts[0];
@@ -52,6 +52,24 @@ contract('Auth', (accounts) => {
       assert.isTrue(isStoreOwner);
     });
   });
+
+  describe('Emergency stop', function() {
+    it('should pause contract successfully', async () => {
+      const firstAdminCandidate = accounts[1];
+
+      const AuthContractInstance = await Auth.deployed();
+      await AuthContractInstance.pause();
+
+      try {
+        await AuthContractInstance.addAdmin(firstAdminCandidate);
+      } catch (error) {
+        error.message.should.include("VM Exception while processing transaction: revert")
+      } finally {
+        await AuthContractInstance.unpause();
+      }
+    });
+  });
+
 
 
 });

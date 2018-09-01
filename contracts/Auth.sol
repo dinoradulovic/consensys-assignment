@@ -1,17 +1,17 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 /// @title Auth - manages users
 /// @author Dino Radulovic
-contract Auth is Ownable {
+contract Auth is Ownable, Pausable {
     address public owner;
 
     /// @notice admins
     mapping (address => bool) public admins;
     /// @notice store owners
     mapping (address => bool) public storeOwners;
-
 
     /// @notice events
     event AdminAdded(address indexed addr);
@@ -28,8 +28,9 @@ contract Auth is Ownable {
 
     /// @notice adds an admin
     function addAdmin(address _address)
-        onlyOwner
-        public
+    whenNotPaused
+    onlyOwner
+    public
     {
         require(admins[_address] != true);
         admins[_address] = true;
@@ -38,8 +39,9 @@ contract Auth is Ownable {
 
     /// @notice removes the admin
     function removeAdmin(address _address)
-        onlyOwner
-        public
+    whenNotPaused
+    onlyOwner
+    public
     {
         delete admins[_address];
         emit AdminRemoved(_address);
@@ -47,7 +49,8 @@ contract Auth is Ownable {
 
     /// @notice adds
     function addStoreOwner(address _address)
-        public
+    whenNotPaused
+    public
     {
         require(storeOwners[_address] != true);
         storeOwners[_address] = true;
@@ -56,6 +59,7 @@ contract Auth is Ownable {
 
     /// @notice removes the store owner
     function removeStoreOwner(address _address)
+    whenNotPaused
     public
     {
         delete storeOwners[_address];

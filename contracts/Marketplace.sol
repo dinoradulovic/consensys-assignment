@@ -1,10 +1,10 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 import './Auth.sol';
 
 /// @title Marketplace - manages stores and products
 /// @author Dino Radulovic
-contract Marketplace {
+contract Marketplace is Pausable {
     address authContractAddress;
     uint public storeIdGenerator;
 
@@ -38,6 +38,14 @@ contract Marketplace {
         _;
     }
 
+    /// @notice checks for store owners validity
+    /// @dev is user authorized to do such operation
+    modifier storeBelongsToUser(uint _storeId) {
+        Store store = storeById[_storeId];
+        require(msg.sender == store.owner);
+        _;
+    }
+
     /// @notice events
     event StoreAdded(address indexed addr, uint id);
     event ProductAdded(uint indexed storeId, uint id, bytes32 name, uint price);
@@ -55,8 +63,9 @@ contract Marketplace {
     /// @dev store IDs are saved in the array
     /// @dev store IDs are used later to get the store
     function addStore()
+    whenNotPaused
     isStoreOwner()
-    public {
+    external {
         storeIdGenerator++;
         storesCountByAccount[msg.sender]++;
 
@@ -70,7 +79,8 @@ contract Marketplace {
     /// @param _address - store owners account
     /// @return tuple (store IDs, store balances)
     function getAllStoreOwnerStores(address _address)
-    public view
+    whenNotPaused
+    external view
     returns (uint[], uint[]) {
         uint[] memory ids = new uint[](storesCountByAccount[_address]);
         uint[] memory storeBalances = new uint[](storesCountByAccount[_address]);
@@ -113,8 +123,10 @@ contract Marketplace {
 
     /// @notice adds product to the store
     function addProductToStore(uint _storeId, bytes32 _name, uint _price)
+    whenNotPaused
     isStoreOwner()
-    public {
+    storeBelongsToUser(_storeId)
+    external {
         productsCount[_storeId]++;
         Product memory product = Product(productsCount[_storeId], _storeId, _name, _price);
         products[_storeId].push(product);
@@ -126,7 +138,9 @@ contract Marketplace {
     /// @notice removes product from the store
     /// @dev some things are weird here, I definitely underestimated it
     function removeProductFromStore(uint _storeId, uint _index)
+    whenNotPaused
     isStoreOwner()
+    storeBelongsToUser(_storeId)
     public {
         uint productId = products[_storeId][_index].id;
         bytes32 productName = products[_storeId][_index].name;
@@ -164,10 +178,11 @@ contract Marketplace {
     }
 
     /// @notice updates the product price
-    function updateProductPrice
-    (uint _storeId, uint _productId, uint _newPrice)
+    function updateProductPrice(uint _storeId, uint _productId, uint _newPrice)
+    whenNotPaused
     isStoreOwner()
-    public {
+    storeBelongsToUser(_storeId)
+    external {
         for (uint i = 0; i < productsCount[_storeId]; i++) {
             if (_productId == products[_storeId][i].id) {
                 products[_storeId][i].price = _newPrice;
@@ -180,7 +195,7 @@ contract Marketplace {
     /// @notice buying a product
     /// @dev increases store's balance
     function buyProduct(uint _productId, uint _storeId)
-    public
+    external
     payable
     {
         storeById[_storeId].balance += productById[_productId].price;
@@ -189,15 +204,16 @@ contract Marketplace {
     /// @notice withdraw from the store
     /// @dev transfers balance to the store owner
     function withdrawFromStore(uint _storeId, uint _amount)
+    whenNotPaused
     isStoreOwner()
-    public {
-        Store storage store = storeById[_storeId];
+    storeBelongsToUser(_storeId)
+    external {
+        require(_amount <= address(this).balance);
 
-        require(msg.sender == store.owner);
+        Store storage store = storeById[_storeId];
+        address storeOwner = store.owner;
 
         store.balance -= _amount;
-
-        address storeOwner = store.owner;
         storeOwner.transfer(_amount);
     }
 }
