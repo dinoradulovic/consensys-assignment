@@ -35,4 +35,4 @@ Following user stories are covered with tests:
 - Store owner should be able to withdraw balance from his store
 - Contract owner should be able to pause the contract in emergency
 
-I tried to cover as much as guard checks as possible.
+I tried to cover as many guard checks as possible.
