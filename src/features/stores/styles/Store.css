@@ -23,7 +23,7 @@
 }
 
 .products-list .product .product-title {
-    color: black;
+    color: white;
     font-weight: bold;
 }
 
@@ -42,9 +42,17 @@
 }
 
 .product .product-details span:nth-child(2) {
-    color: #0c1a2b;
+    color: #1efbff;
     font-weight: bold;
     margin-left: 10px;
+    border: 1px solid #9794f9;
+}
+
+.product .product-details span {
+    background: black;
+    color: white;
+    padding: 0 10px;
+    font-size: 12px;
 }
 
 .product .product-management, .product .product-buy {
@@ -124,4 +132,23 @@
 }
 .add-product form label span {
     flex: 0 0 25%;
+}
+
+
+
+.add-product .file-upload {
+    border: none;
+    box-shadow: 1px 1px 1px black;
+    cursor: pointer;
+}
+
+
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start !Important;
+}
+
+.file-upload-container img {
+    width: 100%;
 }

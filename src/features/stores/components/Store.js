@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import ipfs from '../../../ipfs';
+
 import RenderIf from '../../helpers/components/RenderIf';
 
 import '../styles/Store.css';
@@ -15,6 +17,9 @@ export default class Store extends Component {
         productPrice: ''
       },
       infoText: '',
+      ipfsHash: '',
+      imageUploading: false,
+      buffer: null,
     }
   }
 
@@ -36,8 +41,14 @@ export default class Store extends Component {
       const product = {
         productId: productIds[i].toNumber(),
         productName: web3.toAscii(productNames[i]),
-        productPrice: productPrices[i].toNumber()
+        productPrice: productPrices[i].toNumber(),
       };
+
+      const productImage = await marketplaceContract.imagesProduct(productIds[i].toNumber());
+
+      if (productImage) {
+        product.productImage = web3.toAscii(productImage);
+      }
 
       productsMapped.push(product);
     }
@@ -68,6 +79,7 @@ export default class Store extends Component {
         storeId,
         web3.fromAscii(this.state.addingProductInputs.productName),
         web3.toWei(this.state.addingProductInputs.productPrice, "ether"),
+        web3.fromAscii(this.state.ipfsHash),
         {
           from: account
         }
@@ -78,6 +90,7 @@ export default class Store extends Component {
           productId:  transaction.logs[0].args.id.toNumber(),
           productName: web3.toAscii(transaction.logs[0].args.name),
           productPrice: transaction.logs[0].args.price.toNumber(),
+          productImage: this.state.ipfsHash,
         })
       });
 
@@ -156,6 +169,50 @@ export default class Store extends Component {
     }
   }
 
+  handleFileUpload(event) {
+    event.preventDefault();
+
+    this.setState({
+      imageUploading: true
+    });
+
+    const file = event.target.files[0];
+    const reader = new window.FileReader();
+
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => {
+      this.setState({
+        buffer: Buffer(reader.result)
+      });
+
+      ipfs.files.add(this.state.buffer, (err, result) => {
+        this.setState({
+          imageUploading: false
+        });
+
+        if (err) {
+          console.log("err", err);
+        }
+
+        this.setState({
+          ipfsHash: result[0].hash
+        });
+      });
+    };
+  }
+
+  renderImagePreview() {
+    if (this.state.imageUploading) {
+      return <div>Uploading image...</div>
+    } else if (this.state.ipfsHash) {
+      return (
+        <img alt="ipfs-image" src={`https://ipfs.io/ipfs/${this.state.ipfsHash}`}/>
+      );
+    }
+
+    return null;
+  }
+
   renderProducts() {
     const { accountType } = this.props;
 
@@ -163,11 +220,19 @@ export default class Store extends Component {
       {
         productId,
         productName,
-        productPrice
+        productPrice,
+        productImage
       }, i
     ) => {
+
+      const imageStyle = {
+        background: `url(https://ipfs.io/ipfs/${productImage})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat"
+      };
+
       return (
-        <div className="product" key={i}>
+        <div className="product" key={i} style={imageStyle}>
           <div className="product-details">
             <div>
               <span className="product-title">Product ID:</span>
@@ -204,6 +269,20 @@ export default class Store extends Component {
     return products;
   }
 
+  renderFileUpload() {
+    return (
+      <label className="file-upload-container">
+        <span>Product image(ipfs)</span>
+        <div>{this.state.productImage}</div>
+        <input
+          type="file"
+          className="file-upload"
+          onChange={(e) => this.handleFileUpload(e)}/>
+        {this.renderImagePreview()}
+      </label>
+    )
+  }
+
   render() {
     const { accountType } = this.props;
     return (
@@ -237,6 +316,7 @@ export default class Store extends Component {
                   onChange={(e) => this.handleOnchangeInput(e, "productPrice")}
                   value={this.state.productPrice} />
               </label>
+              {this.renderFileUpload()}
               <input type="submit" value="Add Product" />
             </form>
           </div>

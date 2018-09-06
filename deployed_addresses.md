@@ -1,0 +1,4 @@
+Rinkeby Testnet
+
+Auth: 0x74175497324a520d69e404fdd9a35cf137289f08
+Marketplace: 0xc75870ec9e67cafb2930d237d3297b1195b0c6a3

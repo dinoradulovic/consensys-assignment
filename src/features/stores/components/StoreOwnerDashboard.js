@@ -16,9 +16,7 @@ export default class StoreOwnerDashboard extends Component {
   }
 
   componentDidMount() {
-    debugger
     if (this.props.accountType === 'shopper') {
-      debugger
       this.getAllStores();
     } else {
       this.getAllStoreOwnerStores();
@@ -26,13 +24,10 @@ export default class StoreOwnerDashboard extends Component {
   }
 
   async getAllStores() {
-    debugger
     const { marketplaceContract } = this.props;
     const stores = await marketplaceContract.getAllStores(this.props.account);
 
     const storeFronts = this.prettyStoresAll(stores);
-
-    debugger
 
     this.setState({
       stores: storeFronts
@@ -78,7 +73,7 @@ export default class StoreOwnerDashboard extends Component {
   prettyStores(stores) {
     const storeIds = stores[0];
     let storeBalances;
-    debugger
+
     if (stores[1]) {
       storeBalances = stores[1];
     }

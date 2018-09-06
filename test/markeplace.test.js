@@ -35,10 +35,11 @@ contract('Marketplace', (accounts) => {
       const storeId =  await MarketplaceContractInstance.storeIdGenerator();
       const productName = "Some Product Name";
       const productPrice = web3.toWei(1, 'ether');
+      const productImage = web3.fromAscii("QmV8RCYpxrqf5tL5b17gd76newKvDXAfbGJXF1Fo1Qnj3W");
 
       const preProductsCount = await MarketplaceContractInstance.productsCount(storeId);
       await MarketplaceContractInstance.addProductToStore(
-        storeId, productName, productPrice,
+        storeId, productName, productPrice, productImage,
         { from: storeOwner });
       const postProductsCount = await MarketplaceContractInstance.productsCount(storeId);
 
@@ -50,9 +51,10 @@ contract('Marketplace', (accounts) => {
       const storeId =  await MarketplaceContractInstance.storeIdGenerator();
       const productName = "Some Product Name";
       const productPrice = web3.toWei(1, 'ether');
+      const productImage = web3.fromAscii("QmV8RCYpxrqf5tL5b17gd76newKvDXAfbGJXF1Fo1Qnj3W");
 
       await MarketplaceContractInstance.addProductToStore(
-        storeId, productName, productPrice,
+        storeId, productName, productPrice, productImage,
         { from: storeOwner });
       const preProductsCount = await MarketplaceContractInstance.productsCount(storeId);
 
@@ -70,9 +72,10 @@ contract('Marketplace', (accounts) => {
       const storeId = await MarketplaceContractInstance.storeIdGenerator();
       const productName = "Some Product Name";
       const productPrice = web3.toWei(1, 'ether');
+      const productImage = web3.fromAscii("QmV8RCYpxrqf5tL5b17gd76newKvDXAfbGJXF1Fo1Qnj3W");
 
       await MarketplaceContractInstance.addProductToStore(
-        storeId, productName, productPrice,
+        storeId, productName, productPrice, productImage,
         { from: storeOwner });
 
       const productId = await MarketplaceContractInstance.productsCount(storeId);
@@ -97,9 +100,10 @@ contract('Marketplace', (accounts) => {
       const storeId = storeIdGenerator.toNumber();
       const productName = "Some Product Name";
       const productPrice = web3.toWei(1, 'ether');
+      const productImage = web3.fromAscii("QmV8RCYpxrqf5tL5b17gd76newKvDXAfbGJXF1Fo1Qnj3W");
 
       await MarketplaceContractInstance.addProductToStore(
-        storeId, productName, productPrice,
+        storeId, productName, productPrice, productImage,
         { from: storeOwner });
 
       const productId = await MarketplaceContractInstance.productsCount(storeId);
@@ -125,9 +129,10 @@ contract('Marketplace', (accounts) => {
 
       const productName = "Some Product Name";
       const someProductPrice = web3.toWei(1, 'ether');
+      const productImage = web3.fromAscii("QmV8RCYpxrqf5tL5b17gd76newKvDXAfbGJXF1Fo1Qnj3W");
 
       await MarketplaceContractInstance.addProductToStore(
-        storeId, productName, someProductPrice,
+        storeId, productName, someProductPrice, productImage,
         { from: storeOwner });
 
       const productId = await MarketplaceContractInstance.productsCount(storeId);
@@ -138,7 +143,7 @@ contract('Marketplace', (accounts) => {
       const contractBalanceBeforeBuy = web3.eth.getBalance(MarketplaceContractInstance.address).toNumber();
 
       await MarketplaceContractInstance.addProductToStore(
-        storeId, productName, productPrice,
+        storeId, productName, productPrice, productImage,
         { from: storeOwner });
 
       const secondProductId = await MarketplaceContractInstance.productsCount(secondStoreId);

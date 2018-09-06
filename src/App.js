@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import contract from 'truffle-contract';
 import { BrowserRouter , Switch, Route, Redirect, Link } from 'react-router-dom';
 
-import getWeb3 from './utils/getWeb3'
+import getWeb3 from './utils/getWeb3';
 
 import AuthContract from '../build/contracts/Auth.json';
 import MarketplaceContract from '../build/contracts/Marketplace.json';

@@ -30,6 +30,7 @@ contract Marketplace is Pausable {
     mapping (uint => Product) public productById;
     mapping (uint => Product[]) public products;
     mapping (uint => uint) public productsCount;
+    mapping (uint => string) public imagesProduct;
 
     /// @notice checks if store owner is making a call
     modifier isStoreOwner() {
@@ -122,7 +123,7 @@ contract Marketplace is Pausable {
 
 
     /// @notice adds product to the store
-    function addProductToStore(uint _storeId, bytes32 _name, uint _price)
+    function addProductToStore(uint _storeId, bytes32 _name, uint _price, string _image)
     whenNotPaused
     isStoreOwner()
     storeBelongsToUser(_storeId)
@@ -131,6 +132,7 @@ contract Marketplace is Pausable {
         Product memory product = Product(productsCount[_storeId], _storeId, _name, _price);
         products[_storeId].push(product);
         productById[productsCount[_storeId]] = product;
+        imagesProduct[productsCount[_storeId]] = _image;
 
         emit ProductAdded(_storeId, productsCount[_storeId], _name, _price);
     }
